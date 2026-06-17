@@ -1,28 +1,25 @@
-# Comparative Study of Transformer Architectures for Scientific Abstract Classification
+# Scientific Abstract Field Classification
 
-This project compares classical and Transformer-based NLP models for classifying scientific paper abstracts into five broad academic fields. It is designed as a resume-level deep learning portfolio project with reproducible training scripts, saved metrics, confusion matrices, model artifacts, prediction, evaluation, and an ablation study for a manually implemented PyTorch Transformer encoder.
+This project compares classical machine learning, pretrained Transformer models, and a custom Transformer encoder for classifying scientific paper abstracts into broad academic fields.
 
-## Project Goal
+The task is a five-class text classification problem: given a paper title and abstract, predict whether it belongs to Computer Science, Mathematics, Physics, Biology, or Economics.
 
-Given a paper title and abstract, predict one of:
+## Highlights
 
-1. Computer Science
-2. Mathematics
-3. Physics
-4. Biology
-5. Economics
-
-The comparison covers:
-
-- TF-IDF + Logistic Regression baseline
-- Fine-tuned DistilBERT
-- Fine-tuned SciBERT
-- Custom Transformer Encoder implemented manually in PyTorch
-- Ablation study of custom Transformer components
+- Prepared the `TimSchopf/arxiv_categories` Hugging Face dataset into train, validation, and test CSV files.
+- Implemented a strong TF-IDF + Logistic Regression baseline.
+- Fine-tuned DistilBERT using Hugging Face Transformers and PyTorch.
+- Added a SciBERT fine-tuning script for scientific-domain pretraining comparison.
+- Built a custom Transformer encoder manually in PyTorch without using `torch.nn.TransformerEncoder`.
+- Added reusable evaluation, plotting, prediction, model saving, and ablation workflows.
 
 ## Dataset
 
-The project uses the Hugging Face dataset `TimSchopf/arxiv_categories`.
+The dataset is loaded from Hugging Face:
+
+```text
+TimSchopf/arxiv_categories
+```
 
 Raw columns:
 
@@ -32,29 +29,27 @@ Raw columns:
 - `categories`
 - `creation_date`
 
-Splits:
-
-- `train`
-- `validation`
-- `test`
-
-Processed files are written to:
-
-- `data/processed/train.csv`
-- `data/processed/validation.csv`
-- `data/processed/test.csv`
-
-The processed text input is:
+The processed model input joins the title and abstract:
 
 ```text
 title [SEP] abstract
 ```
 
+Processed files are generated under `data/processed/`, but the CSV files are intentionally not committed because they can be recreated from the public dataset.
+
 ## Label Mapping
 
-Labels are mapped from the archive name before `Archive` in the first category path:
+The original arXiv categories contain archive paths such as:
 
-| Raw archive prefix | Final label |
+```text
+Computer Science Archive->cs.CV
+Physics Archive->astro-ph->astro-ph.EP
+Mathematics Archive->math.PR
+```
+
+This project maps the archive prefix to five broad labels:
+
+| Archive prefix | Label |
 | --- | --- |
 | `Computer Science Archive` | Computer Science |
 | `Mathematics Archive` | Mathematics |
@@ -62,25 +57,23 @@ Labels are mapped from the archive name before `Archive` in the first category p
 | `Quantitative Biology Archive` | Biology |
 | `Economics Archive` | Economics |
 
-The numeric labels are defined in `source/utils.py`.
-
-## Model Architectures
+## Models
 
 ### TF-IDF + Logistic Regression
 
-A scikit-learn pipeline using `TfidfVectorizer` with unigram/bigram features and a balanced Logistic Regression classifier. This is the fast, interpretable baseline.
+The baseline uses TF-IDF features with unigram and bigram terms, followed by a balanced one-vs-rest Logistic Regression classifier. It is fast, interpretable, and useful as a reference point for the neural models.
 
 ### DistilBERT
 
-Fine-tunes `distilbert-base-uncased` with a sequence classification head using Hugging Face Transformers and a manual PyTorch training loop.
+DistilBERT is fine-tuned with a sequence classification head. It provides a compact pretrained Transformer baseline with lower compute cost than BERT-base models.
 
 ### SciBERT
 
-Fine-tunes `allenai/scibert_scivocab_uncased`, a BERT model pretrained on scientific text. This is expected to be especially competitive for scientific abstracts.
+SciBERT is included because it is pretrained on scientific text. It is expected to be a strong comparison point for scientific abstract classification, especially when trained on enough examples.
 
 ### Custom Transformer Encoder
 
-Implemented manually in `source/transformer_model.py`, including:
+The custom model in `source/transformer_model.py` implements the main Transformer encoder components directly:
 
 - token embeddings
 - sinusoidal positional encoding
@@ -93,7 +86,42 @@ Implemented manually in `source/transformer_model.py`, including:
 - masked mean pooling
 - classification head
 
-The custom model intentionally does not use `torch.nn.TransformerEncoder`.
+The implementation uses PyTorch tensor operations and standard layers such as `nn.Linear`, `nn.Embedding`, `nn.LayerNorm`, and `nn.Dropout`, but does not use `torch.nn.TransformerEncoder` as the main model.
+
+## Current Results
+
+The committed metrics are saved in `results/`. The table below reports test-set results from the current completed runs.
+
+| Model | Accuracy | Weighted F1 | Macro F1 |
+| --- | ---: | ---: | ---: |
+| TF-IDF + Logistic Regression | 0.9476 | 0.9481 | 0.8135 |
+| Custom Transformer Encoder | 0.9170 | 0.9134 | 0.5395 |
+| DistilBERT | 0.9170 | 0.9130 | 0.5398 |
+
+The baseline is currently the strongest run by weighted F1. This is a useful result rather than a failure: field classification often has strong vocabulary signals, so a TF-IDF baseline can be very competitive. The pretrained and custom Transformer runs still provide important architectural comparisons and can be improved with longer training, larger sample sizes, and hyperparameter tuning.
+
+Confusion matrices are available in `figures/`:
+
+- `figures/confusion_matrix_baseline.png`
+- `figures/confusion_matrix_custom_transformer.png`
+- `figures/confusion_matrix_distilbert.png`
+
+The ablation results are saved as:
+
+- `results/ablation_results.csv`
+- `figures/ablation_plot.png`
+
+## Ablation Study
+
+The custom Transformer ablation compares:
+
+- positional encoding vs no positional encoding
+- different numbers of attention heads
+- different numbers of encoder layers
+- different feed-forward dimensions
+- different dropout rates
+
+These experiments are intended to show how individual Transformer design choices affect validation performance.
 
 ## Installation
 
@@ -105,7 +133,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-On macOS/Linux, activate with:
+On macOS or Linux:
 
 ```bash
 source .venv/bin/activate
@@ -125,118 +153,55 @@ Optional dataset inspection:
 python source/explore_dataset.py
 ```
 
-## Train Models
+## Training
 
-All scripts are runnable from the project root.
+All commands are run from the project root.
 
-### Baseline
+Train the baseline:
 
 ```bash
 python source/train_baseline.py
 ```
 
-Outputs:
-
-- `saved_models/baseline/baseline.joblib`
-- `results/baseline_metrics.json`
-- `figures/confusion_matrix_baseline.png`
-
-### DistilBERT
-
-Fast laptop-friendly default:
-
-```bash
-python source/train_distilbert.py
-```
-
-Stronger run:
-
-```bash
-python source/train_distilbert.py --max-train-samples 0 --max-val-samples 0 --max-test-samples 0 --epochs 3
-```
-
-Outputs:
-
-- `saved_models/distilbert/`
-- `results/distilbert_metrics.json`
-- `figures/confusion_matrix_distilbert.png`
-
-### SciBERT
-
-Fast laptop-friendly default:
-
-```bash
-python source/train_scibert.py
-```
-
-Stronger run:
-
-```bash
-python source/train_scibert.py --max-train-samples 0 --max-val-samples 0 --max-test-samples 0 --epochs 3
-```
-
-Outputs:
-
-- `saved_models/scibert/`
-- `results/scibert_metrics.json`
-- `figures/confusion_matrix_scibert.png`
-
-### Custom Transformer
-
-Fast laptop-friendly default:
+Train the custom Transformer:
 
 ```bash
 python source/train_custom_transformer.py
 ```
 
-Stronger run:
+Train DistilBERT:
 
 ```bash
-python source/train_custom_transformer.py --max-train-samples 0 --max-val-samples 0 --max-test-samples 0 --epochs 8 --embedding-dim 256 --num-heads 8 --num-layers 4 --feed-forward-dim 512
+python source/train_distilbert.py
 ```
 
-Outputs:
-
-- `saved_models/custom_transformer/custom_transformer.pt`
-- `saved_models/custom_transformer/vocab.json`
-- `saved_models/custom_transformer/model_config.json`
-- `results/custom_transformer_metrics.json`
-- `figures/confusion_matrix_custom_transformer.png`
-
-## Run Ablation Study
+Train SciBERT:
 
 ```bash
-python source/run_ablation.py
+python source/train_scibert.py
 ```
 
-Outputs:
+For faster laptop runs, each neural training script supports sample limits:
 
-- `results/ablation_results.csv`
-- `figures/ablation_plot.png`
+```bash
+python source/train_distilbert.py --max-train-samples 1000 --max-val-samples 300 --max-test-samples 300 --epochs 1 --batch-size 4 --max-length 128
+```
 
-The ablation compares:
+For stronger runs, use the full processed splits:
 
-- with vs without positional encoding
-- different attention head counts
-- different encoder layer counts
-- different feed-forward dimensions
-- different dropout rates
+```bash
+python source/train_distilbert.py --max-train-samples 0 --max-val-samples 0 --max-test-samples 0 --epochs 3
+```
 
-## Evaluate a Saved Model
+## Evaluation
 
-Evaluate on the test split by default:
+Evaluate a saved model on the test split:
 
 ```bash
 python source/evaluate.py --model-type baseline
 python source/evaluate.py --model-type distilbert
 python source/evaluate.py --model-type scibert
 python source/evaluate.py --model-type custom_transformer
-```
-
-Evaluate another split:
-
-```bash
-python source/evaluate.py --model-type custom_transformer --split validation
 ```
 
 Metrics include:
@@ -248,7 +213,9 @@ Metrics include:
 - confusion matrix
 - class-level error analysis
 
-## Predict a Field
+## Prediction
+
+Predict the field for a new title and abstract:
 
 ```bash
 python source/predict.py --model-type baseline --title "Graph neural networks for molecules" --abstract "We introduce a message passing architecture for molecular property prediction."
@@ -261,39 +228,38 @@ Available model types:
 - `scibert`
 - `custom_transformer`
 
-The script prints the predicted field and class probabilities.
-
-## Interpreting the Comparison
-
-Use the baseline to establish a strong classical reference point. It often performs well when field-specific vocabulary is highly distinctive.
-
-DistilBERT should improve contextual understanding while staying relatively fast. SciBERT may outperform DistilBERT because its pretraining data is closer to arXiv-style scientific text.
-
-The custom Transformer demonstrates architectural understanding. It may not beat pretrained models without much more data, compute, and tuning, but it is valuable for explaining how attention, positional encoding, depth, heads, feed-forward size, and dropout affect performance.
-
-Weighted F1 is useful when class counts are imbalanced. Macro F1 is stricter because it treats all classes equally. The confusion matrices and class-level error analysis help identify which academic fields are being confused and whether the model is overfitting to dominant classes.
-
 ## Project Structure
 
 ```text
 scientific-abstract-transformer-study/
-├── source/
-│   ├── explore_dataset.py
-│   ├── prepare_dataset.py
-│   ├── train_baseline.py
-│   ├── train_distilbert.py
-│   ├── train_scibert.py
-│   ├── train_custom_transformer.py
-│   ├── transformer_model.py
-│   ├── evaluate.py
-│   ├── predict.py
-│   ├── run_ablation.py
-│   ├── hf_training.py
-│   └── utils.py
-├── data/processed/
-├── results/
-├── figures/
-├── saved_models/
-├── requirements.txt
-└── README.md
+|-- source/
+|   |-- explore_dataset.py
+|   |-- prepare_dataset.py
+|   |-- train_baseline.py
+|   |-- train_distilbert.py
+|   |-- train_scibert.py
+|   |-- train_custom_transformer.py
+|   |-- transformer_model.py
+|   |-- evaluate.py
+|   |-- predict.py
+|   |-- run_ablation.py
+|   |-- hf_training.py
+|   `-- utils.py
+|-- data/processed/
+|-- results/
+|-- figures/
+|-- saved_models/
+|-- requirements.txt
+`-- README.md
 ```
+
+## Repository Notes
+
+The repository tracks source code, documentation, final metrics, and final plots. Large generated files are excluded:
+
+- processed dataset CSV files
+- saved model weights
+- virtual environments
+- smoke-test outputs
+
+The `.gitkeep` files are placeholders that allow Git to preserve empty directories such as `data/processed/` and `saved_models/`.
