@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE/project files
+.idea/
+.vscode/
+
+# Local data and generated artifacts
+data/processed/*.csv
+saved_models/*
+results/*_smoke*
+figures/*_smoke*
+
+# Keep output directories in the repository.
+!data/processed/.gitkeep
+!results/.gitkeep
+!figures/.gitkeep
+!saved_models/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db

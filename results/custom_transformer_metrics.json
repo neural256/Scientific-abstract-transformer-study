@@ -1,0 +1,244 @@
+{
+  "model": "Custom Transformer Encoder",
+  "class_names": [
+    "Computer Science",
+    "Mathematics",
+    "Physics",
+    "Biology",
+    "Economics"
+  ],
+  "model_config": {
+    "max_vocab_size": 30000,
+    "min_freq": 2,
+    "max_length": 256,
+    "embedding_dim": 128,
+    "num_heads": 4,
+    "num_layers": 2,
+    "feed_forward_dim": 256,
+    "dropout": 0.2,
+    "use_positional_encoding": true
+  },
+  "training_config": {
+    "seed": 42,
+    "epochs": 3,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "gradient_clip": 1.0,
+    "max_train_samples": 10000,
+    "max_val_samples": 2000,
+    "max_test_samples": 2000,
+    "train_size": 10000,
+    "validation_size": 2000,
+    "test_size": 2000,
+    "vocab_size": 24868
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5984280873506594,
+      "validation_accuracy": 0.88,
+      "validation_weighted_f1": 0.8790950591861121,
+      "validation_macro_f1": 0.5161290576939926
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.32409470459333245,
+      "validation_accuracy": 0.9075,
+      "validation_weighted_f1": 0.9032568610425689,
+      "validation_macro_f1": 0.5327257578383208
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.24744857112749125,
+      "validation_accuracy": 0.911,
+      "validation_weighted_f1": 0.9068415222985687,
+      "validation_macro_f1": 0.5357438381506382
+    }
+  ],
+  "training_seconds": 1518.0772008895874,
+  "validation": {
+    "accuracy": 0.911,
+    "weighted_f1": 0.9068415222985687,
+    "macro_f1": 0.5357438381506382,
+    "classification_report": {
+      "Computer Science": {
+        "precision": 0.8864734299516909,
+        "recall": 0.8929440389294404,
+        "f1-score": 0.8896969696969697,
+        "support": 411.0
+      },
+      "Mathematics": {
+        "precision": 0.8766066838046273,
+        "recall": 0.8080568720379147,
+        "f1-score": 0.840937114673243,
+        "support": 422.0
+      },
+      "Physics": {
+        "precision": 0.9306599832915622,
+        "recall": 0.9661751951431049,
+        "f1-score": 0.9480851063829787,
+        "support": 1153.0
+      },
+      "Biology": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 9.0
+      },
+      "Economics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 5.0
+      },
+      "accuracy": 0.911,
+      "macro avg": {
+        "precision": 0.5387480194095761,
+        "recall": 0.533435221222092,
+        "f1-score": 0.5357438381506382,
+        "support": 2000.0
+      },
+      "weighted avg": {
+        "precision": 0.9036597805054344,
+        "recall": 0.911,
+        "f1-score": 0.9068415222985687,
+        "support": 2000.0
+      }
+    },
+    "class_level_error_analysis": {
+      "Computer Science": {
+        "support": 411,
+        "correct": 367,
+        "errors": 44,
+        "error_rate": 0.1070559610705596,
+        "most_confused_with": "Mathematics",
+        "most_confused_count": 28
+      },
+      "Mathematics": {
+        "support": 422,
+        "correct": 341,
+        "errors": 81,
+        "error_rate": 0.19194312796208532,
+        "most_confused_with": "Physics",
+        "most_confused_count": 62
+      },
+      "Physics": {
+        "support": 1153,
+        "correct": 1114,
+        "errors": 39,
+        "error_rate": 0.033824804856895055,
+        "most_confused_with": "Computer Science",
+        "most_confused_count": 21
+      },
+      "Biology": {
+        "support": 9,
+        "correct": 0,
+        "errors": 9,
+        "error_rate": 1.0,
+        "most_confused_with": "Computer Science",
+        "most_confused_count": 4
+      },
+      "Economics": {
+        "support": 5,
+        "correct": 0,
+        "errors": 5,
+        "error_rate": 1.0,
+        "most_confused_with": "Computer Science",
+        "most_confused_count": 3
+      }
+    }
+  },
+  "test": {
+    "accuracy": 0.917,
+    "weighted_f1": 0.9134199992333554,
+    "macro_f1": 0.539538573442683,
+    "classification_report": {
+      "Computer Science": {
+        "precision": 0.8752941176470588,
+        "recall": 0.9029126213592233,
+        "f1-score": 0.8888888888888888,
+        "support": 412.0
+      },
+      "Mathematics": {
+        "precision": 0.8854961832061069,
+        "recall": 0.8266033254156769,
+        "f1-score": 0.855036855036855,
+        "support": 421.0
+      },
+      "Physics": {
+        "precision": 0.9424703891708968,
+        "recall": 0.9653379549393414,
+        "f1-score": 0.9537671232876712,
+        "support": 1154.0
+      },
+      "Biology": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 9.0
+      },
+      "Economics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 4.0
+      },
+      "accuracy": 0.917,
+      "macro avg": {
+        "precision": 0.5406521380048124,
+        "recall": 0.5389707803428483,
+        "f1-score": 0.539538573442683,
+        "support": 2000.0
+      },
+      "weighted avg": {
+        "precision": 0.9105129493517871,
+        "recall": 0.917,
+        "f1-score": 0.9134199992333554,
+        "support": 2000.0
+      }
+    },
+    "class_level_error_analysis": {
+      "Computer Science": {
+        "support": 412,
+        "correct": 372,
+        "errors": 40,
+        "error_rate": 0.0970873786407767,
+        "most_confused_with": "Mathematics",
+        "most_confused_count": 27
+      },
+      "Mathematics": {
+        "support": 421,
+        "correct": 348,
+        "errors": 73,
+        "error_rate": 0.17339667458432304,
+        "most_confused_with": "Physics",
+        "most_confused_count": 50
+      },
+      "Physics": {
+        "support": 1154,
+        "correct": 1114,
+        "errors": 40,
+        "error_rate": 0.03466204506065858,
+        "most_confused_with": "Computer Science",
+        "most_confused_count": 23
+      },
+      "Biology": {
+        "support": 9,
+        "correct": 0,
+        "errors": 9,
+        "error_rate": 1.0,
+        "most_confused_with": "Physics",
+        "most_confused_count": 5
+      },
+      "Economics": {
+        "support": 4,
+        "correct": 0,
+        "errors": 4,
+        "error_rate": 1.0,
+        "most_confused_with": "Computer Science",
+        "most_confused_count": 3
+      }
+    }
+  }
+}
